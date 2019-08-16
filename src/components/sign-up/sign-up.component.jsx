@@ -69,7 +69,6 @@ class SignUp extends React.Component {
                         type="text"
                         name="displayName"
                         value={displayName}
-
                         onChange = {this.handleChange}
                         label="Display Name"
                         id="fiels-display-name"
