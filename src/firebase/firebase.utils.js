@@ -1,17 +1,34 @@
 import firebase from "firebase/app";
 import "firebase/auth";
 import "firebase/firestore";
+import FirebaseConfigs from "./firebase.config";
 
+const config = FirebaseConfigs;
 
-const config = {
-    apiKey: "AIzaSyAt6HoK_axwtjqn-fU6zmVC1-cheK2Q4gk",
-    authDomain: "crown-db-997ff.firebaseapp.com",
-    databaseURL: "https://crown-db-997ff.firebaseio.com",
-    projectId: "crown-db-997ff",
-    storageBucket: "",
-    messagingSenderId: "1021338163151",
-    appId: "1:1021338163151:web:a5cb37c784c1ef7d"
-  };
+export const createUserProfileDocument = async (userAuth, additionalData) => {
+  if (!userAuth) return;
+  const userRef = firestore.doc(`users/${userAuth.uid}`);
+
+  const snapShot = await userRef.get();
+
+  if (!snapShot.exists) {
+    const {displayName, email} = userAuth;
+    const createdAt = new Date();
+
+    try {
+      await userRef.set({
+        displayName,
+        email,
+        createdAt,
+        ...additionalData,
+      })
+    } catch (err) {
+      console.log("Error Creating user: ", err.message)
+    }
+  }
+
+  return userRef;
+};
 
 firebase.initializeApp(config);
 
@@ -19,14 +36,10 @@ export const auth = firebase.auth();
 
 export const firestore = firebase.firestore();
 
-
 const provider = new firebase.auth.GoogleAuthProvider();
 
-provider.setCustomParameters({prompt: 'select_account'});
+provider.setCustomParameters({ prompt: "select_account" });
 
 export const signInWithGoogle = () => auth.signInWithPopup(provider);
 
-
 export default firebase;
-
-
